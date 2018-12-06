@@ -1,13 +1,36 @@
 package configer
 
 import (
-"log"
-
-"github.com/fsnotify/fsnotify"
+	"errors"
 	"fmt"
+	"log"
+	"os"
+	"path"
+
+	"path/filepath"
+
+	"github.com/fsnotify/fsnotify"
 )
 
-func AddConfigDirectory(path string) {
+func AddConfigPath(configPath string) (err error) {
+	fd, err := os.Stat(configPath)
+	if err != nil {
+		return
+	}
+	if fd.IsDir() {
+		err = errors.New("Path can't be a dir.")
+		return
+	}
+
+	var absPath string
+	if !path.IsAbs(configPath) {
+		absPath, _ = filepath.Abs(configPath)
+	} else {
+		absPath = configPath
+	}
+
+	parentPath := path.Dir(configPath)
+
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		log.Fatal(err)
@@ -23,9 +46,8 @@ func AddConfigDirectory(path string) {
 					fmt.Println("return")
 					return
 				}
-				log.Println("event:", event)
-				if event.Op&fsnotify.Write == fsnotify.Write {
-					log.Println("modified file:", event.Name)
+				if event.Name == absPath {
+					fmt.Println("文件改动")
 				}
 			case err, ok := <-watcher.Errors:
 				if !ok {
@@ -37,9 +59,10 @@ func AddConfigDirectory(path string) {
 		}
 	}()
 
-	err = watcher.Add(directory)
+	err = watcher.Add(parentPath)
 	if err != nil {
 		log.Fatal(err)
 	}
 	<-done
+	return
 }
