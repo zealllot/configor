@@ -47,7 +47,13 @@ func AddConfigPath(configPath string) (err error) {
 					return
 				}
 				if event.Name == absPath {
-					fmt.Println("文件改动")
+					switch event.Op {
+					case fsnotify.Create:
+					case fsnotify.Remove:
+					case fsnotify.Write:
+					case fsnotify.Chmod:
+					case fsnotify.Rename:
+					}
 				}
 			case err, ok := <-watcher.Errors:
 				if !ok {
