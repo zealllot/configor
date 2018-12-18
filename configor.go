@@ -1,4 +1,4 @@
-package configer
+package configor
 
 import (
 	"errors"
@@ -6,13 +6,20 @@ import (
 	"log"
 	"os"
 	"path"
-
 	"path/filepath"
+
+	"io/ioutil"
 
 	"github.com/fsnotify/fsnotify"
 )
 
-func AddConfigPath(configPath string) (err error) {
+func Load(configPath string) {
+	go addConfigPath(configPath)
+	log.Println("Path: ", configPath)
+	log.Println("Initial configor...")
+}
+
+func addConfigPath(configPath string) (err error) {
 	fd, err := os.Stat(configPath)
 	if err != nil {
 		return
@@ -29,7 +36,7 @@ func AddConfigPath(configPath string) (err error) {
 		absPath = configPath
 	}
 
-	parentPath := path.Dir(configPath)
+	dirPath := path.Dir(configPath)
 
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
@@ -37,7 +44,6 @@ func AddConfigPath(configPath string) (err error) {
 	}
 	defer watcher.Close()
 
-	done := make(chan bool)
 	go func() {
 		for {
 			select {
@@ -49,10 +55,20 @@ func AddConfigPath(configPath string) (err error) {
 				if event.Name == absPath {
 					switch event.Op {
 					case fsnotify.Create:
+						log.Println(event.Op)
+						loadConfig(absPath)
 					case fsnotify.Remove:
+						log.Println(event.Op)
+						loadConfig(absPath)
 					case fsnotify.Write:
+						log.Println(event.Op)
+						loadConfig(absPath)
 					case fsnotify.Chmod:
+						log.Println(event.Op)
+						loadConfig(absPath)
 					case fsnotify.Rename:
+						log.Println(event.Op)
+						loadConfig(absPath)
 					}
 				}
 			case err, ok := <-watcher.Errors:
@@ -65,10 +81,21 @@ func AddConfigPath(configPath string) (err error) {
 		}
 	}()
 
-	err = watcher.Add(parentPath)
+	err = watcher.Add(dirPath)
 	if err != nil {
 		log.Fatal(err)
 	}
-	<-done
+	select {}
+	return
+}
+
+func loadConfig(path string) (content string, err error) {
+	bytesFile, err := ioutil.ReadFile(path)
+	if err != nil {
+		return
+	}
+	content = string(bytesFile)
+	log.Println(`Content: 
+` + content)
 	return
 }

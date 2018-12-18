@@ -3,14 +3,13 @@ package main
 import (
 	"os"
 
-	"github.com/zealllot/configer"
+	"github.com/zealllot/configor"
 )
 
 func main() {
 	here, _ := os.Getwd()
 	configPath := here + "/test"
 
-	//fmt.Println(here)
-	configer.AddConfigPath(configPath)
+	configor.Load(configPath)
 	select {}
 }
