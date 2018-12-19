@@ -5,6 +5,8 @@ import (
 	"os"
 	"time"
 
+	"reflect"
+
 	"github.com/zealllot/configor"
 )
 
@@ -17,7 +19,19 @@ func main() {
 	for {
 		<-t
 		for k, v := range *m {
-			fmt.Println(k, "=", v)
+			if value, ok := v.(int); ok {
+				fmt.Println(reflect.TypeOf(value).Kind())
+				fmt.Println(k, "=", value)
+			}
+			if value, ok := v.(float64); ok {
+				fmt.Println(reflect.TypeOf(value).Kind())
+				fmt.Println(k, "=", value)
+			}
+			if value, ok := v.(string); ok {
+				fmt.Println(reflect.TypeOf(value).Kind())
+				fmt.Println(k, "=", value)
+			}
+
 		}
 		fmt.Println("\nonce\n")
 	}
