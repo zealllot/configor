@@ -128,8 +128,8 @@ func loadConfig(path string) (kvMap map[string]interface{}, err error) {
 	if err != nil {
 		return
 	}
-	var key []byte
-	var value []byte
+	var key []rune
+	var value []rune
 	var readKey bool
 	var hasRead bool
 	kvMap = make(map[string]interface{})
@@ -154,7 +154,7 @@ func loadConfig(path string) (kvMap map[string]interface{}, err error) {
 				return
 			}
 			if v != ' ' && !hasRead {
-				key = append(key, v)
+				key = append(key, rune(v))
 				continue
 			}
 		} else {
@@ -169,9 +169,36 @@ func loadConfig(path string) (kvMap map[string]interface{}, err error) {
 			if v == '\n' {
 				readKey = true
 				hasRead = false
-				kvMap[string(key)] = string(value)
-				key = []byte{}
-				value = []byte{}
+
+				var notInt bool
+				var notFloat bool
+
+				for k, vv := range value {
+					if !((48 < vv && vv < 57) || vv == 46) {
+						notFloat = true
+					} else if (k == 0 || k == len(value)-1) && value[k] == 46 {
+						notFloat = true
+					}
+				}
+
+				for _, vv := range value {
+					if !(48 < vv && vv < 57) {
+						notInt = true
+					}
+				}
+
+				if !notInt {
+					//int
+					kvMap[string(key)] = runeToInt(value)
+				} else if !notFloat {
+					//float
+				} else {
+					//string
+					kvMap[string(key)] = string(value)
+				}
+
+				key = []rune{}
+				value = []rune{}
 				continue
 			}
 			if hasRead && v != ' ' {
@@ -179,7 +206,7 @@ func loadConfig(path string) (kvMap map[string]interface{}, err error) {
 				return
 			}
 			if v != ' ' && !hasRead {
-				value = append(value, v)
+				value = append(value, rune(v))
 				continue
 			}
 		}
