@@ -59,11 +59,7 @@ func addConfigPath(configPath string, kvMap *map[string]interface{}) {
 	go func() {
 		for {
 			select {
-			case event, ok := <-watcher.Events:
-				if !ok {
-					log.Println("return")
-					return
-				}
+			case event := <-watcher.Events:
 				if event.Name == absPath {
 					switch event.Op {
 					case fsnotify.Create:
@@ -113,11 +109,7 @@ func addConfigPath(configPath string, kvMap *map[string]interface{}) {
 						}
 					}
 				}
-			case err, ok := <-watcher.Errors:
-				if !ok {
-					log.Println("return")
-					return
-				}
+			case err := <-watcher.Errors:
 				log.Println(err)
 			}
 		}
