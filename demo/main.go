@@ -21,6 +21,4 @@ func main() {
 		}
 		fmt.Println("\nonce\n")
 	}
-
-	select {}
 }
