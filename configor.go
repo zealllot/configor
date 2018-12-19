@@ -22,14 +22,16 @@ func Load(configPath string) (kvMap *map[string]interface{}) {
 	return
 }
 
-func addConfigPath(configPath string, kvMap *map[string]interface{}) (err error) {
+func addConfigPath(configPath string, kvMap *map[string]interface{}) {
+	backupMap := make(map[string]interface{})
+
 	fd, err := os.Stat(configPath)
 	if err != nil {
-		return
+		log.Fatal(err)
 	}
 	if fd.IsDir() {
 		err = errors.New("Path can't be a dir.")
-		return
+		log.Fatal(err)
 	}
 
 	var absPath string
@@ -39,9 +41,11 @@ func addConfigPath(configPath string, kvMap *map[string]interface{}) (err error)
 		absPath = configPath
 	}
 
+	backupMap = *kvMap
 	*kvMap, err = loadConfig(absPath)
 	if err != nil {
-		return
+		log.Fatal(err)
+		*kvMap = backupMap
 	}
 
 	dirPath := path.Dir(configPath)
@@ -64,33 +68,48 @@ func addConfigPath(configPath string, kvMap *map[string]interface{}) (err error)
 					switch event.Op {
 					case fsnotify.Create:
 						log.Println(event.Op)
+						backupMap = *kvMap
 						*kvMap, err = loadConfig(absPath)
 						if err != nil {
-							return
+							log.Println(err)
+							*kvMap = backupMap
+							log.Println("Rollback to the latest version!")
 						}
 					case fsnotify.Remove:
 						log.Println(event.Op)
+						backupMap = *kvMap
 						*kvMap, err = loadConfig(absPath)
 						if err != nil {
-							return
+							log.Println(err)
+							*kvMap = backupMap
+							log.Println("Rollback to the latest version!")
 						}
 					case fsnotify.Write:
 						log.Println(event.Op)
+						backupMap = *kvMap
 						*kvMap, err = loadConfig(absPath)
 						if err != nil {
-							return
+							log.Println(err)
+							*kvMap = backupMap
+							log.Println("Rollback to the latest version!")
 						}
 					case fsnotify.Chmod:
 						log.Println(event.Op)
+						backupMap = *kvMap
 						*kvMap, err = loadConfig(absPath)
 						if err != nil {
-							return
+							log.Println(err)
+							*kvMap = backupMap
+							log.Println("Rollback to the latest version!")
 						}
 					case fsnotify.Rename:
 						log.Println(event.Op)
+						backupMap = *kvMap
 						*kvMap, err = loadConfig(absPath)
 						if err != nil {
-							return
+							log.Println(err)
+							*kvMap = backupMap
+							log.Println("Rollback to the latest version!")
 						}
 					}
 				}
@@ -99,7 +118,7 @@ func addConfigPath(configPath string, kvMap *map[string]interface{}) (err error)
 					log.Println("return")
 					return
 				}
-				log.Println("error:", err)
+				log.Println(err)
 			}
 		}
 	}()
