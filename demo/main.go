@@ -11,9 +11,7 @@ import (
 func main() {
 	here, _ := os.Getwd()
 	configPath := here + "/test"
-
 	m := configor.Load(configPath)
-
 	t := time.Tick(time.Second * 5)
 
 	for {
