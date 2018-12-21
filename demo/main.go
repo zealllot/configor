@@ -3,9 +3,8 @@ package main
 import (
 	"fmt"
 	"os"
-	"time"
-
 	"reflect"
+	"time"
 
 	"github.com/zealllot/configor"
 )

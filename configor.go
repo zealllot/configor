@@ -189,10 +189,10 @@ func loadConfig(path string) (kvMap map[string]interface{}, err error) {
 
 				if !notInt {
 					//int
-					kvMap[string(key)] = runeToInt(value)
+					kvMap[string(key)] = runesToInt(value)
 				} else if !notFloat {
 					//float
-					kvMap[string(key)] = runeToFloat64(value)
+					kvMap[string(key)] = runesToFloat64(value)
 				} else {
 					//string
 					kvMap[string(key)] = string(value)

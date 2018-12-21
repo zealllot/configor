@@ -1,6 +1,6 @@
 package configor
 
-func runeToInt(r []rune) (result int) {
+func runesToInt(r []rune) (result int) {
 	for i := len(r) - 1; i >= 0; i-- {
 		ten := 1
 		for j := 0; j < len(r)-1-i; j++ {
@@ -11,7 +11,7 @@ func runeToInt(r []rune) (result int) {
 	return
 }
 
-func runeToFloat64(r []rune) (result float64) {
+func runesToFloat64(r []rune) (result float64) {
 	var beforePoint bool
 	var lenPoint int
 	for i := len(r) - 1; i >= 0; i-- {
