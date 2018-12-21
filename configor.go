@@ -198,7 +198,11 @@ func loadConfig(path string) (kvMap map[string]interface{}, err error) {
 					kvMap[string(key)] = runesToFloat64(value)
 				} else {
 					//string
-					kvMap[string(key)] = string(value)
+					if _, ok := kvMap[string(value)]; ok {
+						kvMap[string(key)] = kvMap[string(value)]
+					} else {
+						kvMap[string(key)] = string(value)
+					}
 				}
 
 				key = key[:0]
