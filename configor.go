@@ -198,8 +198,8 @@ func loadConfig(path string) (kvMap map[string]interface{}, err error) {
 					kvMap[string(key)] = string(value)
 				}
 
-				key = []rune{}
-				value = []rune{}
+				key = key[:0]
+				value = value[:0]
 				continue
 			}
 			if hasRead && v != ' ' {
