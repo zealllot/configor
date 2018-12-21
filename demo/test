@@ -1,5 +1,8 @@
 a=6
+
+
  b=hello
 c = 3.5
 d="a"
+
 d=c
