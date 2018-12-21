@@ -134,55 +134,55 @@ func loadConfig(path string) (kvMap map[string]interface{}, err error) {
 	var hasRead bool
 	kvMap = make(map[string]interface{})
 	readKey = true
-	for _, v := range bytesFile {
+	for _, aByte := range bytesFile {
 		if readKey {
-			if v == '\n' {
+			if aByte == '\n' {
 				err = errors.New("Incorrect config file! ")
 				return
 			}
-			if len(key) > 0 && v == ' ' {
+			if len(key) > 0 && aByte == ' ' {
 				hasRead = true
 				continue
 			}
-			if v == '=' {
+			if aByte == '=' {
 				readKey = false
 				hasRead = false
 				continue
 			}
-			if hasRead && v != ' ' {
+			if hasRead && aByte != ' ' {
 				err = errors.New("Incorrect config file! ")
 				return
 			}
-			if v != ' ' && !hasRead {
-				key = append(key, rune(v))
+			if aByte != ' ' && !hasRead {
+				key = append(key, rune(aByte))
 				continue
 			}
 		} else {
-			if v == '=' {
+			if aByte == '=' {
 				err = errors.New("Incorrect config file! ")
 				return
 			}
-			if len(value) > 0 && v == ' ' {
+			if len(value) > 0 && aByte == ' ' {
 				hasRead = true
 				continue
 			}
-			if v == '\n' {
+			if aByte == '\n' {
 				readKey = true
 				hasRead = false
 
 				var notInt bool
 				var notFloat bool
 
-				for k, vv := range value {
-					if !((48 < vv && vv < 57) || vv == 46) {
+				for idValue, aRune := range value {
+					if !((48 < aRune && aRune < 57) || aRune == 46) {
 						notFloat = true
-					} else if (k == 0 || k == len(value)-1) && value[k] == 46 {
+					} else if (idValue == 0 || idValue == len(value)-1) && value[idValue] == 46 {
 						notFloat = true
 					}
 				}
 
-				for _, vv := range value {
-					if !(48 < vv && vv < 57) {
+				for _, aRune := range value {
+					if !(48 < aRune && aRune < 57) {
 						notInt = true
 					}
 				}
@@ -202,12 +202,12 @@ func loadConfig(path string) (kvMap map[string]interface{}, err error) {
 				value = value[:0]
 				continue
 			}
-			if hasRead && v != ' ' {
+			if hasRead && aByte != ' ' {
 				err = errors.New("Incorrect config file! ")
 				return
 			}
-			if v != ' ' && !hasRead {
-				value = append(value, rune(v))
+			if aByte != ' ' && !hasRead {
+				value = append(value, rune(aByte))
 				continue
 			}
 		}
