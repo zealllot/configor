@@ -136,9 +136,13 @@ func loadConfig(path string) (kvMap map[string]interface{}, err error) {
 	readKey = true
 	for idBytes, aByte := range bytesFile {
 		if readKey {
+			if idBytes == len(bytesFile)-1 {
+				if len(key) > 0 || aByte != '\n' {
+					err = errors.New("Incorrect config file! ")
+					return
+				}
+			}
 			if aByte == '\n' {
-				//err = errors.New("Incorrect config file! ")
-				//return
 				continue
 			}
 			if len(key) > 0 && aByte == ' ' {
